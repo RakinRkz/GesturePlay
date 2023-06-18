@@ -1,5 +1,5 @@
 # from https://github.com/cvzone/cvzone/blob/master/cvzone/HandTrackingModule.py
-
+# modified for only landmarks
 import cv2
 import mediapipe as mp
 import math

@@ -1,65 +1,74 @@
 import cv2
-import time
+from HandTrackingModule import HandDetector
+from ClassificationModule import Classifier
 import numpy as np
-import HandTrackingModule as htm
 import math
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+import time
+from Controller import MediaController
 
-wCam, hCam = 640, 480
-cap = cv2.VideoCapture(0)
-cap.set(3, wCam)
-cap.set(4, hCam)
-pTime = 0
+cap = cv2.VideoCapture (0)
+detector = HandDetector(maxHands=1)
+classifier = Classifier("Model/keras_model.h5", "Model/labels.txt")
+confidence_threshold = 0.98
 
-detector = htm.HandDetector(detectionCon=0.7)
+media_controller = MediaController(delay=0.6)
 
-devices = AudioUtilities.GetSpeakers()
-interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-volume = interface.QueryInterface(IAudioEndpointVolume)
-volRange = volume.GetVolumeRange()
-volume.SetMasterVolumeLevel(0, None)
-minVol = volRange[0]
-maxVol = volRange[1]
-vol = 0
-volBar = 400
-volPer = 0
+offset =20
+imgSize = 300
+
+counter = 0
+
+labels = ["play", "pause", "left", "right", "up", "down"]
+# time.sleep(5)
 
 while True:
     success, img = cap.read()
-    img = detector.findHands(img)
-    lmList = detector.findPosition(img, draw=False)
-    if len(lmList) != 0:
-        x1, y1 = lmList[4][1], lmList[4][2]
-        x2, y2 = lmList[8][1], lmList[8][2]
-        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+    imgOutput = img.copy()
+    hands, img = detector.findHands(img)
+    if hands:
+        hand = hands[0]
+        x, y, w, h = hand['bbox']
 
-        cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
-        cv2.circle(img, (x2, y2), 15, (255, 0, 255), cv2.FILLED)
-        cv2.line(img, (x1, y1), (x2, y2), (255, 0, 255), 3)
-        cv2.circle(img, (cx, cy), 15, (255, 0, 255), cv2.FILLED)
+        imgWhite = np.ones((imgSize, imgSize, 3), np.uint8)*255
+        imgCrop = img[y - offset:y + h + offset, x - offset:x + w + offset]
 
-        length = math.hypot(x2 - x1, y2 - y1)
-        vol = np.interp(length, [50, 300], [minVol, maxVol])
-        volBar = np.interp(length, [50, 300], [400, 150])
-        volPer = np.interp(length, [50, 300], [0, 100])
+        if 0 in imgCrop.shape:
+            continue
 
-        print(int(length), vol)
-        volume.SetMasterVolumeLevel(vol, None)
+        imgCropShape = imgCrop.shape
+        aspectRatio = h/w
 
-        if length < 50:
-            cv2.circle(img, (cx, cy), 15, (0, 255, 0), cv2.FILLED)
+        if aspectRatio > 1:
+            k = imgSize/h
+            wCal = math.ceil(k*w)
+            print(imgCrop.shape)
+            imgResize = cv2.resize(imgCrop, (wCal, imgSize))
+            imgResizeShape = imgResize.shape
+            wGap = math.ceil((imgSize - wCal) / 2)
+            imgWhite[:, wGap:wCal + wGap] = imgResize
+            prediction, index = classifier.getPrediction(imgWhite, draw=True)
+            print(prediction, index)
+        else:
+            k = imgSize / w
+            hCal = math.ceil(k * h)
+            print(imgCrop.shape)
+            imgResize = cv2.resize(imgCrop, (imgSize, hCal))
+            imgResizeShape = imgResize.shape
+            hGap = math.ceil((imgSize - hCal) / 2)
+            imgWhite[hGap:hCal + hGap, :] = imgResize
+            prediction, index = classifier.getPrediction(imgWhite, draw=True)
 
-    cv2.rectangle(img, (50, 150), (85, 400), (255, 0, 0), 3)
-    cv2.rectangle(img, (50, int(volBar)), (85, 400), (255, 0, 0), cv2.FILLED)
-    cv2.putText(img, f'{int(volPer)}%', (40, 450), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 3)
+        if prediction[index] > confidence_threshold:
+            media_controller.media_control(control_type=int(index))
+            cv2.rectangle(imgOutput, (x - offset, y - offset-50),
+                          (x - offset+90, y - offset-50+50), (255, 0, 255), cv2.FILLED)
 
-    cTime = time.time()
-    fps = 1 / (cTime - pTime)
-    pTime = cTime
+            cv2.putText(imgOutput, labels[index],(x,y-26),cv2.FONT_HERSHEY_COMPLEX, 1.7 ,(255,255,255),2)
+            cv2.rectangle(imgOutput, (x - offset, y - offset),
+                          (x + w + offset, y + h + offset), (255, 0, 255), 4)
 
-    cv2.putText(img, f'FPS: {int(fps)}', (40, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 3)
+        cv2.imshow("ImageCrop", imgCrop)
+        cv2.imshow("ImageWhite", imgWhite)
 
-    cv2.imshow("Img", img)
+    cv2.imshow("Image", imgOutput)
     cv2.waitKey(1)
