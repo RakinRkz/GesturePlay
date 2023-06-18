@@ -14,7 +14,7 @@ class HandDetector:
     provides bounding box info of the hand found.
     """
 
-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5, minTrackCon=0.5, landmarks_only=True):
+    def __init__(self, mode=False, maxHands=2, detectionCon=0.7, minTrackCon=0.7, landmarks_only=True):
         """
         :param mode: In static mode, detection is done on each image: slower
         :param maxHands: Maximum number of hands to detect
