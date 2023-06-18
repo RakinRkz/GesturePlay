@@ -28,7 +28,7 @@ import time
 
 
 class MediaController:
-    def __init__(self, state=0, delay=0.5):
+    def __init__(self, state=1, delay=0.5):
         self.state = state
         self.delay = delay
         self.last_time_pressed = time.time()
@@ -52,4 +52,5 @@ class MediaController:
         elif control_type == 5:
             pyautogui.press('down')
 
+        self.last_time_pressed = time.time()
         # time.sleep(self.delay)
