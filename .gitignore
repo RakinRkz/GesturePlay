@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-test.py
 # C extensions
 *.so
 
@@ -161,3 +160,5 @@ cython_debug/
 #.idea/
 
 draft.py
+test.py
+
