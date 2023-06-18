@@ -1,0 +1,6 @@
+0 play
+1 pause
+2 left
+3 right
+4 up
+5 down
