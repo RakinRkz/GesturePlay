@@ -6,6 +6,8 @@ import math
 import time
 from Controller import MediaController
 
+DEBUG = True
+
 cap = cv2.VideoCapture (0)
 detector = HandDetector(maxHands=1)
 classifier = Classifier("Model/keras_model.h5", "Model/labels.txt")
@@ -66,9 +68,10 @@ while True:
             cv2.putText(imgOutput, labels[index],(x,y-26),cv2.FONT_HERSHEY_COMPLEX, 1.7 ,(255,255,255),2)
             cv2.rectangle(imgOutput, (x - offset, y - offset),
                           (x + w + offset, y + h + offset), (255, 0, 255), 4)
+        if DEBUG:
+            cv2.imshow("ImageCrop", imgCrop)
+            cv2.imshow("ImageWhite", imgWhite)
 
-        cv2.imshow("ImageCrop", imgCrop)
-        cv2.imshow("ImageWhite", imgWhite)
-
-    cv2.imshow("Image", imgOutput)
+    if DEBUG:
+        cv2.imshow("Image", imgOutput)
     cv2.waitKey(1)
