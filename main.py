@@ -8,7 +8,7 @@ from Controller import MediaController
 
 DEBUG = True
 
-cap = cv2.VideoCapture (0)
+cap = cv2.VideoCapture(0)
 detector = HandDetector(maxHands=1)
 classifier = Classifier("Model/keras_model.h5", "Model/labels.txt")
 confidence_threshold = 0.98
