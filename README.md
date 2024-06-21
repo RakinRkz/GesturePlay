@@ -1,4 +1,5 @@
 # GesturePlay
+![Tools](https://skillicons.dev/icons?i=opencv,python,tensorflow)
 
 **Built with [Python](https://www.python.org/), [MediaPipe](https://google.github.io/mediapipe/), [TensorFlow](https://www.tensorflow.org/), and [Google Teachable Machines](https://teachablemachine.withgoogle.com/)**
 
