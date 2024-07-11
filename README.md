@@ -5,12 +5,14 @@
 
 **GesturePlay** is an innovative application designed to revolutionize how you interact with your digital media. By leveraging the power of Python and Google's Teachable Machine model, GesturePlay utilizes your webcam to detect hand gestures, allowing you to control various media functionalities through simple, intuitive movements.
 
-## Features
+## Implemented Features
 
 - **Hand Gesture Detection**: Utilizes your webcam to recognize a wide range of hand gestures.
 - **Media Control**: Seamlessly integrates with your media player, enabling you to play, pause, skip tracks, adjust volume, and more with just a wave of your hand.
 - **Customizable Gestures**: Easily customize the gestures to suit your preferences or create new ones to fit your unique needs.
 - **Cross-platform Compatibility**: Works seamlessly across Windows, macOS, and Linux, ensuring you can enjoy GesturePlay no matter what operating system you use.
+
+
 
 ## Getting Started
 
@@ -36,4 +38,8 @@ To get started with GesturePlay, follow these simple steps:
    ```
    python main.py
    ```
+
+## Conclusion
+This is an academic project for Machine learning lab course. Gestureplay is a implementation of ML and DL that can serve as a useful tool while consuming media besides doing some other tasks such as having a snack and watching youtube etc.
+This has potential to be integrated inside smart tvs and computers or phones that can use camera for media control via hand gestures.
    
